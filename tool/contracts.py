@@ -24,16 +24,18 @@ def compile_contract(filename):
 
     with open(filename, 'r') as myfile:
         code=myfile.read()
+#        print(code)
     
     p=Popen(['solc','--bin','--abi','-o','out',source_file,'--overwrite'], stdout=PIPE, stdin=PIPE, stderr=STDOUT)
     solo = ''
     while p.poll() is None:
         l = p.stdout.readline()
-        solo += bytes.decode(l)
+        solo += str(l)
     if 'Error' in solo:
         print(solo)
         print('\033[91m[-] Cannot compile the contract \033[0m')
         exit()
+#    print (p.stdout.read())
     p.wait()
 
     print('\033[92m Done \033[0m')
@@ -87,12 +89,7 @@ def deploy_contract(filename, etherbase, rawcode = False):
     MyGlobals.web3.personal.unlockAccount(etherbase, '1', 15000)
 
 
-    try:
-        transaction_creation_hash = MyGlobals.web3.eth.sendTransaction( {'from':etherbase, 'data': ('0x' if byt[0:2]!='0x' else '') +byt , 'gas':6000000} )
-    except Exception as e:
-        print ("Exception: "+str(e))
-        return None
-
+    transaction_creation_hash = MyGlobals.web3.eth.sendTransaction( {'from':etherbase, 'data': ('0x' if byt[0:2]!='0x' else '') +byt } )
     global s
     s = sched.scheduler(time.time, time.sleep)
     s.enter(1, 1, confirm_contract, (transaction_creation_hash,))
@@ -115,6 +112,8 @@ def confirm_contract(transaction_creation_hash):
     receipt = MyGlobals.web3.eth.getTransactionReceipt(transaction_creation_hash)
     if( receipt is not None):
         contract_address = receipt['contractAddress']
+        #print(receipt)
+        #print(MyGlobals.web3.eth.getTransaction(transaction_creation_hash))
         return
 
     s.enter(1, 1, confirm_contract, (transaction_creation_hash,))

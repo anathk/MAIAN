@@ -25,7 +25,7 @@ def run_one_check( max_call_depth, ops, contract_address, debug, read_from_block
     clear_globals()
 
     global MAX_CALL_DEPTH
-    MyGlobals.MAX_CALL_DEPTH    = max_call_depth
+    MyGlobals.MAX_CALL_DEPTH 	= max_call_depth
 
     storage = {}    
     stack   = []

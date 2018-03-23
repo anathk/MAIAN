@@ -20,7 +20,7 @@ def is_params(param,input):
 # Set parameter
 def set_params(param, input, value):
     global st
-    MyGlobals.st[param+str(input)] = value      
+    MyGlobals.st[param+str(input)] = value		
 
 
 # Create a dict of paramters
@@ -110,9 +110,9 @@ def print_configuration( conf ):
 class MyGlobals(object):
 
 
-    MAX_JUMP_DEPTH          = 60                    # path length in CFG
-    MAX_CALL_DEPTH          = 0                     # different function calls to the contract
-    MAX_VISITED_NODES       = 2000                  # sum of all paths in search of one contract
+    MAX_JUMP_DEPTH 			= 60					# path length in CFG
+    MAX_CALL_DEPTH 			= 0						# different function calls to the contract
+    MAX_VISITED_NODES      	= 2000					# sum of all paths in search of one contract
     max_calldepth_in_normal_search = 3
 
     ETHER_LOCK_GOOD_IF_CAN_CALL = True
@@ -123,7 +123,7 @@ class MyGlobals(object):
     # Z3 solver
     # 
     s = None
-    SOLVER_TIMEOUT = 10000          #timeout
+    SOLVER_TIMEOUT = 10000			#timeout
 
     search_condition_found = False
     stop_search = False

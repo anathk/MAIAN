@@ -28,7 +28,7 @@ def execute_one_block( ops , stack , pos , trace, storage, mmemory, data, config
 
 
         first = False
-        pos = newpos    
+        pos = newpos	
             
         # If no more code, then stop
         if pos >= len(ops) or pos < 0:
@@ -152,7 +152,7 @@ def execute_one_block( ops , stack , pos , trace, storage, mmemory, data, config
 
 
                 #
-                # Branch when decision is incorrect (no need to compute the addresses)      
+                # Branch when decision is incorrect (no need to compute the addresses)		
                 #
 
                 # In the fast search mode, the jumpi pos + 1 must be in the list of good jump positions
@@ -174,7 +174,7 @@ def execute_one_block( ops , stack , pos , trace, storage, mmemory, data, config
                             if debug: print('\t'*8+'-'*20+'JUMPI branch 1 (go through)')
                             sole = ''
 
-                            execute_one_block(ops,stack2,   pos + 1,    trace2, storage2,   mmemory2, data2, configurations,    search_op, search_function, jumpdepth+1, calldepth, debug, read_from_blockchain )
+                            execute_one_block(ops,stack2,	pos + 1, 	trace2, storage2, 	mmemory2, data2, configurations, 	search_op, search_function, jumpdepth+1, calldepth, debug, read_from_blockchain )
 
 
                     except Exception as e:
@@ -225,7 +225,7 @@ def execute_one_block( ops , stack , pos , trace, storage, mmemory, data, config
 
                             if debug: print( ('\t'*8+'-'*20+'JUMPI branch 2 (jump) on step %x' + sole ) % ops[pos]['id'] )
 
-                            execute_one_block(ops,stack2,   new_position,   trace2, storage2,   mmemory2, data2, configurations,    search_op, search_function,  jumpdepth, calldepth, debug, read_from_blockchain )
+                            execute_one_block(ops,stack2,	new_position, 	trace2, storage2, 	mmemory2, data2, configurations, 	search_op, search_function,  jumpdepth, calldepth, debug, read_from_blockchain )
 
 
                     except Exception as e:
@@ -296,7 +296,7 @@ def execute_one_block( ops , stack , pos , trace, storage, mmemory, data, config
                         MyGlobals.s.push()
                         MyGlobals.s.add( BitVec('input'+str(calldepth)+('[%x'%addr.as_long())+']',256) == one_branch_size)
 
-                        execute_one_block(ops,stack2,   pos+1,  trace2, storage2,   mmemory2, data2, configurations,    search_op, search_function,  jumpdepth, calldepth, debug, read_from_blockchain )
+                        execute_one_block(ops,stack2,	pos+1, 	trace2, storage2, 	mmemory2, data2, configurations, 	search_op, search_function,  jumpdepth, calldepth, debug, read_from_blockchain )
 
                         MyGlobals.s.pop()
 
@@ -328,7 +328,7 @@ def execute_one_block( ops , stack , pos , trace, storage, mmemory, data, config
                     if -1 not in data2:
                         data2['inputlength-'+str(calldepth)] = BitVec('inputlength-'+str(calldepth), 256)
                     stack2.append( {'type':'constant','step':ops[pos]['id'], 'z3': data2['inputlength-'+str(calldepth)]} )
-                    execute_one_block(ops,stack2,   pos+1,  trace2, storage2,   mmemory2, data2, configurations,    search_op, search_function,  jumpdepth, calldepth, debug, read_from_blockchain )
+                    execute_one_block(ops,stack2,	pos+1, 	trace2, storage2, 	mmemory2, data2, configurations, 	search_op, search_function,  jumpdepth, calldepth, debug, read_from_blockchain )
 
                     
                     # or Branch on 4 different FIXED sizes
@@ -343,7 +343,7 @@ def execute_one_block( ops , stack , pos , trace, storage, mmemory, data, config
                         
                         stack2.append( {'type':'constant','step':ops[pos]['id'], 'z3': BitVecVal(one_branch_size,256)} )
 
-                        execute_one_block(ops,stack2,   pos+1,  trace2, storage2,   mmemory2, data2, configurations,    search_op, search_function,  jumpdepth, calldepth, debug, read_from_blockchain )
+                        execute_one_block(ops,stack2,	pos+1, 	trace2, storage2, 	mmemory2, data2, configurations, 	search_op, search_function,  jumpdepth, calldepth, debug, read_from_blockchain )
                     
 
                     return 

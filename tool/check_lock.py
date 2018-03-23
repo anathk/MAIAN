@@ -33,7 +33,7 @@ def ether_lock_can_send( op, stack, trace, debug ):
         return True, True 
     # 2) Once we find CALL, we still need to reach some STOP, RETURN, etc. 
     # In this case, we are more precise, but may lead to false positives
-    else:   
+    else:	
         return True, False
 
 
@@ -48,7 +48,7 @@ def run_one_check( max_call_depth, ops, contract_address, debug, read_from_block
     clear_globals()
 
     global MAX_CALL_DEPTH
-    MyGlobals.MAX_CALL_DEPTH    = max_call_depth
+    MyGlobals.MAX_CALL_DEPTH 	= max_call_depth
 
     storage = {}    
     stack   = []
@@ -87,7 +87,7 @@ def check_one_contract_on_ether_lock(contract_bytecode, contract_address, debug 
     set_params( 'call_value', '','100'  )
     clear_globals()
 
-    MyGlobals.MAX_CALL_DEPTH = 1                    # Only one function has to be called 
+    MyGlobals.MAX_CALL_DEPTH = 1					# Only one function has to be called 
 
     storage = {}    
     stack   = []

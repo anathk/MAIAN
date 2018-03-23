@@ -13,8 +13,8 @@ def ether_leak( op, stack, trace, debug ):
     # CALL leaks
     if op == 'CALL' and len(stack) >= 7 and stack[-2]['type'] == 'constant' and stack[-3]['type']=='constant':
         MyGlobals.s.push()
-        MyGlobals.s.add( stack[-2]['z3'] == BitVecVal( int( get_params('my_address',''), 16), 256) )        # CALL sent address coincides with our address
-        MyGlobals.s.add( stack[-3]['z3'] > 0)                                                               # amount of Ether sent is > 0
+        MyGlobals.s.add( stack[-2]['z3'] == BitVecVal( int( get_params('my_address',''), 16), 256) )		# CALL sent address coincides with our address
+        MyGlobals.s.add( stack[-3]['z3'] > 0)																# amount of Ether sent is > 0
         try:
             if MyGlobals.s.check() == sat:
 
@@ -32,7 +32,7 @@ def ether_leak( op, stack, trace, debug ):
     if op == 'SUICIDE' and len(stack) >= 1 and stack[-1]['type'] == 'constant':
 
         MyGlobals.s.push()
-        MyGlobals.s.add( stack[-1]['z3'] == BitVecVal( int( get_params('my_address',''), 16), 256) )        # SUICIDE send address coincides with our address
+        MyGlobals.s.add( stack[-1]['z3'] == BitVecVal( int( get_params('my_address',''), 16), 256) )		# SUICIDE send address coincides with our address
         
         try:
             if MyGlobals.s.check() == sat:
@@ -65,7 +65,7 @@ def run_one_check( max_call_depth, ops, contract_address, debug, read_from_block
     # The amount of sent Ether to the contract is zero
     set_params( 'call_value', '','0'  )
 
-    MyGlobals.MAX_CALL_DEPTH    = max_call_depth
+    MyGlobals.MAX_CALL_DEPTH 	= max_call_depth
 
     storage = {}    
     stack   = []
@@ -93,7 +93,7 @@ def check_one_contract_on_ether_leak(contract_bytecode, contract_address, debug 
     ops = parse_code( contract_bytecode, debug )
     if not code_has_instruction( ops, ['CALL','SUICIDE']) :
         #if debug: 
-        print('\033[92m[+] The code does not have CALL/SUICIDE, hence it is not prodigal\033[0m')
+        print('\033[91m[-] The code does not have CALL/SUICIDE\033[0m')
         return False
     if debug: print_code( contract_bytecode, ops )
 
@@ -123,7 +123,7 @@ def check_one_contract_on_ether_leak(contract_bytecode, contract_address, debug 
             for n in range(MyGlobals.no_function_calls):
                 if MyGlobals.function_calls[n+1]['input'][:8] in fhashes:
                     print('    -'+fhashes[ MyGlobals.function_calls[n+1]['input'][:8] ])
-            print() 
+            print()	
 
 
         if confirm_exploit:
@@ -160,7 +160,7 @@ def check_one_contract_on_ether_leak(contract_bytecode, contract_address, debug 
         return True
 
 
-    print('\n\033[92m[+] No prodigal vulnerability found \033[0m')
+    print('\n\033[92m[-] No prodigal vulnerability found \033[0m')
     return False
 
 

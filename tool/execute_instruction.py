@@ -242,7 +242,7 @@ def execute( code, stack, pos, storage, mmemory, data, trace, calldepth, debug, 
 
                 val = ''
                 all_good = True
-                for i in range(exact_offset/32):
+                for i in range(int(exact_offset/32)):
                     if (exact_address + i*32) not in mmemory or not is_fixed(mmemory[exact_address+i*32]): 
                         all_good = False
                         break
@@ -285,7 +285,7 @@ def execute( code, stack, pos, storage, mmemory, data, trace, calldepth, debug, 
     elif op == 'NUMBER':        stack.append( {'type':'constant','step':step, 'z3': BitVecVal(int(get_params('block_number',''),16), 256)} )
     elif op == 'GASLIMIT':      stack.append( {'type':'constant','step':step, 'z3': BitVecVal(int(get_params('gas_limit',''),16), 256)} )
     elif op == 'TIMESTAMP':     stack.append( {'type':'constant','step':step, 'z3': BitVecVal(int(get_params('time_stamp',''),16), 256)} )
-    elif op == 'CALLVALUE':     stack.append( {'type':'constant','step':step, 'z3': BitVecVal(int(get_params('call_value',''),16), 256)} )
+    elif op == 'CALLVALUE':	    stack.append( {'type':'constant','step':step, 'z3': BitVecVal(int(get_params('call_value',''),16), 256)} )
     elif op == 'ADDRESS':       stack.append( {'type':'constant','step':step, 'z3': BitVecVal(int(get_params('contract_address',''), 16), 256)} )
     elif op == 'ORIGIN':        stack.append( {'type':'constant','step':step, 'z3': BitVecVal(int(get_params('contract_address',''), 16), 256)} )
     elif op == 'GASPRICE':      stack.append( {'type':'constant','step':step, 'z3': BitVecVal(int(get_params('gas_price',''), 16), 256) } )
@@ -304,7 +304,7 @@ def execute( code, stack, pos, storage, mmemory, data, trace, calldepth, debug, 
         if not is_good_jump(code, pos, debug): 
             return pos, True
 
-    elif op in ['STOP','RETURN','REVERT', 'INVALID', 'SUICIDE']:    halt = True
+    elif op in ['STOP','RETURN','REVERT', 'INVALID', 'SUICIDE']:	halt = True
 
     elif op in ['CALLDATALOAD']:
 
@@ -528,12 +528,12 @@ def execute( code, stack, pos, storage, mmemory, data, trace, calldepth, debug, 
         if not is_fixed( addr ):
             if debug: print('\033[95m[-] In JUMP the address cannot be determined \033[0m'  )
             return pos, True
-        
+    
         jump_dest = get_value( addr )
         if( jump_dest <= 0):
             if debug: print('\033[95m[-] The JUMP destination is not a valid address : %x\033[0m'  % jump_dest )
             return pos, True
-        
+    
         new_position= find_pos(code, jump_dest )
 
         if( new_position < 0):
@@ -554,7 +554,7 @@ def execute( code, stack, pos, storage, mmemory, data, trace, calldepth, debug, 
         word    = args[1]
         if is_undefined(word) or is_undefined(byte_no): 
             res = {'type':'undefined','step':step}
-        else:                                           
+        else:  											
             res = {'type':'constant','step':step, 'z3': (word['z3'] >> (8*(31-byte_no['z3'])) ) & 0xff }
 
         stack.append( res )
