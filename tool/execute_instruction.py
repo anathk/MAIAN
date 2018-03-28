@@ -242,7 +242,7 @@ def execute( code, stack, pos, storage, mmemory, data, trace, calldepth, debug, 
 
                 val = ''
                 all_good = True
-                for i in range(int(exact_offset/32)):
+                for i in range(exact_offset//32):
                     if (exact_address + i*32) not in mmemory or not is_fixed(mmemory[exact_address+i*32]): 
                         all_good = False
                         break
@@ -353,7 +353,7 @@ def execute( code, stack, pos, storage, mmemory, data, trace, calldepth, debug, 
 
 
             if value < 10000:
-                for i in range(value/32):
+                for i in range(value//32):
                     mmemory[addr + 32 * i] = { 'type':'undefined','step':step }
 
         stack.append( {'type':'constant','step':step, 'z3':BitVec('call_at_step_'+str(step), 256) & 0x1} )     # assume the result of call can be any (True or False)
@@ -383,7 +383,7 @@ def execute( code, stack, pos, storage, mmemory, data, trace, calldepth, debug, 
                 print('\033[95m[-] In CALLDATACOPY the length of array (%d) is not multiple of 32 \033[0m' % length )
             return pos, True
 
-        for i in range( length / 32 ):
+        for i in range( length // 32 ):
             data[ datapos + 32 * i ] = BitVec('input'+str(calldepth)+'['+str(datapos + 32 * i )+']',256)
             store_in_memory( mmemory, memaddr + 32 * i , {'type':'constant','step':step,'z3':data[ datapos + 32 * i ]} )
 
