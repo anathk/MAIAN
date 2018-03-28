@@ -1,0 +1,6 @@
+*.csv
+tool/out/*
+tool/__pycache__/
+*.txt
+tool/blockchains/emptychain/
+tool/.ipynb_checkpoints/
