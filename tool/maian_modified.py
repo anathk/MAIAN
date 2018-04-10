@@ -24,6 +24,8 @@ from __future__ import print_function
 from web3 import Web3, KeepAliveRPCProvider, IPCProvider
 import argparse,subprocess,sys
 from pathlib import Path
+import time
+import multiprocessing
 
 
 found_depend = False
@@ -121,26 +123,50 @@ def main(args):
             print('\033[92m Sent! \033[0m')
 
         # Deploy the contract
-        if args.soliditycode: 	contract_address = deploy_contract(args.soliditycode[1], MyGlobals.etherbase_account)
-        else: 					contract_address = deploy_contract(args.bytecode_source, MyGlobals.etherbase_account, True)
-
-        # If check on leak, then make sure the contract has Ether
-        if 1 == MyGlobals.checktype:
-            bal = MyGlobals.web3.eth.getBalance(contract_address)
-            print('\033[1m[ ] The contract balance: %d  \033[0m' % bal, end='' )
-            if bal > 0:
-                print('\033[92m Positive balance\033[0m')
+        try:
+            if args.soliditycode:
+                contract_address = deploy_contract(args.soliditycode[1], MyGlobals.etherbase_account)
             else:
-                print('cound not send Ether to contract')
-                return 
+                contract_address = deploy_contract(args.bytecode_source, MyGlobals.etherbase_account, True)
+
+            # If check on leak, then make sure the contract has Ether
+            if 1 == MyGlobals.checktype:
+                bal = MyGlobals.web3.eth.getBalance(contract_address)
+                print('\033[1m[ ] The contract balance: %d  \033[0m' % bal, end='' )
+                if bal > 0:
+                    print('\033[92m Positive balance\033[0m')
+                else:
+                    print('cound not send Ether to contract')
+                    return 
 
 
-        code = MyGlobals.web3.eth.getCode(contract_address)
-        if code[0:2] == '0x': code = code[2:]
+            code = MyGlobals.web3.eth.getCode(contract_address)
+            if code[0:2] == '0x': code = code[2:]
+        except Exception as e:
+            print(e)
+            return
+                                            
+           
+        try:
+            start_time = time.time() 
+            ret0 = check_suicide.check_one_contract_on_suicide(code, contract_address, MyGlobals.debug, MyGlobals.read_from_blockchain, True, fhashes)
+            write_log('suicidal_test.csv', f'{Path(args.bytecode_source).stem},{ret0},{time.time() - start_time}\n')
+            
+            start_time = time.time() 
+            ret1 = check_leak.check_one_contract_on_ether_leak(code, contract_address, MyGlobals.debug, MyGlobals.read_from_blockchain, True, fhashes)
+            write_log('prodigal_test.csv', f'{Path(args.bytecode_source).stem},{ret1},{time.time() - start_time}\n')
+            
+            start_time = time.time() 
+            ret2 =  check_lock.check_one_contract_on_ether_lock(code, contract_address, MyGlobals.debug, MyGlobals.read_from_blockchain)
+            write_log('greedy_test.csv', f'{Path(args.bytecode_source).stem},{ret2},{time.time() - start_time}\n')
+        except Exception as e:
+            kill_active_blockchain()
+            print('Error on checking!!!')  
+            print(e)
 
-        if 0 == MyGlobals.checktype: ret = check_suicide.check_one_contract_on_suicide(code, contract_address, MyGlobals.debug, MyGlobals.read_from_blockchain, True, fhashes)
-        elif 1== MyGlobals.checktype: ret = check_leak.check_one_contract_on_ether_leak(code, contract_address, MyGlobals.debug, MyGlobals.read_from_blockchain, True, fhashes)
-        elif 2== MyGlobals.checktype: ret =  check_lock.check_one_contract_on_ether_lock(code, contract_address, MyGlobals.debug, MyGlobals.read_from_blockchain)
+#         if 0 == MyGlobals.checktype: ret = check_suicide.check_one_contract_on_suicide(code, contract_address, MyGlobals.debug, MyGlobals.read_from_blockchain, True, fhashes)
+#         elif 1== MyGlobals.checktype: ret = check_leak.check_one_contract_on_ether_leak(code, contract_address, MyGlobals.debug, MyGlobals.read_from_blockchain, True, fhashes)
+#         elif 2== MyGlobals.checktype: ret =  check_lock.check_one_contract_on_ether_lock(code, contract_address, MyGlobals.debug, MyGlobals.read_from_blockchain)
 
         kill_active_blockchain()
 
@@ -194,11 +220,18 @@ if __name__ == '__main__':
     import sys
     #main(sys.argv[1:])
     p = Path('/dl4se/zchao/datasets/etherscan/bytecode').glob('./*')
-    files = [x for x in p if x.is_file()]
+    files = [x for x in p if x.is_file()][2029:]
     
     for index, file in enumerate(files):
         print(f'Processing {index+1}/{len(files)}, filename: {file.name}\n')
-        main(('-bs', str(file), '-c', '0'))
+        p = multiprocessing.Process(target=main, name='main', args=(['-bs', str(file), '-c', '0'],))
+        p.start()
+        p.join(30)
+        
+        if p.is_alive():
+            p.terminate()
+            p.join()
+        #main(('-bs', str(file), '-c', '0'))
 
 
     
